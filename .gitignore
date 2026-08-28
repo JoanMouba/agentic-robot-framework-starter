@@ -1,8 +1,29 @@
+# Environnement Python
 .venv/
-.idea/
 __pycache__/
 *.pyc
+
+# Résultats Robot Framework (générés à chaque run)
 Results/*.xml
 Results/*.html
 Results/*.png
 !Results/.gitkeep
+
+# JetBrains (PyCharm, IntelliJ)
+.idea/
+
+# Visual Studio Code
+.vscode/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim / Emacs (fichiers de sauvegarde temporaires)
+*.swp
+*.swo
+*~
+
+# Fichiers système
+.DS_Store
+Thumbs.db
