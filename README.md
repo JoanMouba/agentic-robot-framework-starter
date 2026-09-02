@@ -3,7 +3,7 @@
 
 ---
 
-**Epignosis Center** · Formateur Robot Framework Accrédité  
+**Epignosis Center** · Formateur Robot Framework Accrédité
 www.epignosis.center · contact@epignosis.center
 
 ---
@@ -14,6 +14,9 @@ Ce projet est un template de démarrage pour les tests Web avec Robot Framework 
 et SeleniumLibrary. Il suit l'architecture **Page Object Model (POM)** et utilise
 l'application de démonstration **Epignosis CRM Demo** comme cible de tests.
 
+Il inclut aussi deux **Agent Skills** prêts à l'emploi, pour générer et auditer des tests
+avec Claude Code — voir la section [Agent Skills](#agent-skills) ci-dessous.
+
 Conçu pour les testeurs manuels qui débutent l'automatisation et les équipes
 qui veulent une base de projet propre et structurée.
 
@@ -22,11 +25,11 @@ qui veulent une base de projet propre et structurée.
 ## Structure du projet
 
 ```
-EpignosisCRM_WebTesting_Starter/
+agentic-robot-framework-starter/
 │
 ├── Tests/
-│   ├── connexion_tests.robot     # 8 tests — page de connexion (/signin)
-│   └── clients_tests.robot       # 8 tests — page clients (/customers)
+│   ├── connexion_tests.robot     # 9 tests — page de connexion (/signin)
+│   └── clients_tests.robot       # 9 tests — page clients (/customers)
 │
 ├── Resources/
 │   ├── commun.resource           # Mots-clés communs (open/close browser)
@@ -38,6 +41,12 @@ EpignosisCRM_WebTesting_Starter/
 │
 ├── Results/                      # Généré automatiquement à l'exécution
 │
+├── skills-templates/             # Agent Skills prêts à copier dans .claude/skills/
+│   ├── creer-tests-rf-de-user-story/
+│   │   └── SKILL.md
+│   └── auditer-conformite-conventions/
+│       └── SKILL.md
+│
 ├── requirements.txt              # Dépendances Python
 └── README.md                     # Ce fichier
 ```
@@ -46,7 +55,7 @@ EpignosisCRM_WebTesting_Starter/
 
 ## Prérequis
 
-### 1. Python 3.9+
+### 1. Python 3.10+
 Vérifiez votre version :
 ```bash
 python --version
@@ -107,35 +116,44 @@ python -c "from webdriver_manager.chrome import ChromeDriverManager; print(Chrom
 
 ## Lancer les tests
 
+> `--console none` évite un bug d'encodage connu sur certaines configurations
+> Windows (`LookupError: unknown encoding: utf-8:surrogateescape`). Les résultats
+> restent entièrement disponibles dans `Results/` même sans affichage console.
+
 ### Tous les tests
 ```bash
-robot --outputdir Results/ Tests/
+robot --console none --outputdir Results/ Tests/
 ```
 
 ### Tests de connexion uniquement
 ```bash
-robot --outputdir Results/ Tests/connexion_tests.robot
+robot --console none --outputdir Results/ Tests/connexion_tests.robot
 ```
 
 ### Tests clients uniquement
 ```bash
-robot --outputdir Results/ Tests/clients_tests.robot
+robot --console none --outputdir Results/ Tests/clients_tests.robot
 ```
 
 ### Tests smoke uniquement (validation rapide)
 ```bash
-robot --include smoke --outputdir Results/ Tests/
+robot --include smoke --console none --outputdir Results/ Tests/
 ```
 
 ### Tests négatifs uniquement
 ```bash
-robot --include negatif --outputdir Results/ Tests/
+robot --include negatif --console none --outputdir Results/ Tests/
+```
+
+### Exclure les fonctionnalités pas encore développées
+```bash
+robot --exclude not-implemented --console none --outputdir Results/ Tests/
 ```
 
 ### Changer le navigateur
 ```bash
-robot --variable NAVIGATEUR:firefox --outputdir Results/ Tests/
-robot --variable NAVIGATEUR:edge    --outputdir Results/ Tests/
+robot --variable NAVIGATEUR:firefox --console none --outputdir Results/ Tests/
+robot --variable NAVIGATEUR:edge    --console none --outputdir Results/ Tests/
 ```
 
 ---
@@ -169,10 +187,30 @@ Page Web          →    Fichier ressource
 
 ---
 
+## Agent Skills
+
+Ce projet inclut deux Agent Skills pour Claude Code, dans `skills-templates/` :
+
+| Skill | Rôle |
+|-------|------|
+| `creer-tests-rf-de-user-story` | Génère des tests Robot Framework à partir d'une user story avec critères d'acceptation |
+| `auditer-conformite-conventions` | Vérifie qu'un fichier `.robot` ou `.resource` respecte les conventions du projet |
+
+**Pour les activer**, copiez le dossier voulu vers `.claude/skills/` :
+
+```bash
+mkdir -p .claude/skills/creer-tests-rf-de-user-story
+cp skills-templates/creer-tests-rf-de-user-story/SKILL.md .claude/skills/creer-tests-rf-de-user-story/SKILL.md
+```
+
+`skills-templates/` est volontairement séparé de `.claude/skills/` : rien ne se déclenche tant que vous n'avez pas copié un fichier au bon endroit.
+
+---
+
 ## Tags disponibles
 
 | Tag                  | Description                              |
-|----------------------|------------------------------------------|
+|-----------------------|------------------------------------------|
 | `smoke`              | Tests de validation rapide               |
 | `connexion`          | Tous les tests de connexion              |
 | `clients`            | Tous les tests de la page clients        |
@@ -184,6 +222,8 @@ Page Web          →    Fichier ressource
 | `formulaire`         | Tests du formulaire nouveau client       |
 | `navigation`         | Tests de navigation entre pages          |
 | `ajout`              | Tests d'ajout de client                  |
+| `recherche`          | Tests de recherche de client             |
+| `not-implemented`    | Échec attendu — fonctionnalité pas encore développée dans l'app |
 
 ---
 
@@ -209,7 +249,7 @@ MDP_VALIDE   = "VotreMotDePasse"
 ## Dépannage fréquent
 
 | Problème                        | Solution                                                    |
-|---------------------------------|-------------------------------------------------------------|
+|----------------------------------|--------------------------------------------------------------|
 | `WebDriverException`            | Mettre à jour ChromeDriver ou utiliser webdriver-manager    |
 | `ElementNotVisibleException`    | Augmenter `TIMEOUT` dans `Config/variables.py`              |
 | `NoSuchElementException`        | Vérifier les localisateurs dans le fichier ressource        |
@@ -229,5 +269,5 @@ Ce template est la base. Pour aller plus loin avec Epignosis Center :
 
 ---
 
-*Epignosis Center — Transformer vos équipes QA en Experts Robot Framework*  
+*Epignosis Center — Transformer vos équipes QA en Experts Robot Framework*
 *www.epignosis.center · contact@epignosis.center*
